@@ -6,11 +6,14 @@ public class PersonnummerValidator
     private static readonly string LogFile = "history.log";
     private static void Main(string[] args)
     {
+        //greeting
+        Console.WriteLine("Welcome to the Swedish Personal and Organisation Number Validator!");
+        Console.WriteLine();
 
         //main program loop
         while (true)
         {
-            Console.WriteLine("Write person/samordnings/organisationnummer or type 'exit' to quit:");
+            Console.WriteLine("Write a 10 or 12 digit number to validate, or type 'exit' to quit:");
             string? input = Console.ReadLine()?.Trim();
 
             // Exit the program if the user types 'exit'
