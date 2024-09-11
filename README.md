@@ -75,4 +75,3 @@ The application logs all validation actions to a file called `history.log` locat
 ## License
 
 This project is licensed under the MIT License.
-```
