@@ -42,7 +42,7 @@ Windows - `build-and-run-win.bat`
 
 To run the application:
 
-1. Clone the repository and ensure the .NET (6) SDK is installed on your machine.
+1. Clone the repository and ensure the .NET SDK is installed on your machine.
 2. Navigate to the solution directory and build the solution:
    ```bash
    dotnet build
