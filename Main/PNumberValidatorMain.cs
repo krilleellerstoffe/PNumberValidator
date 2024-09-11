@@ -47,10 +47,12 @@ public class PersonnummerValidator
             Log("ERROR: Input is null or empty.");
             return false;
         }
+        Log($"Validating: {input.Substring(0, Math.Min(input.Length, 13))}...");
+        Console.WriteLine($"Validating: {input.Substring(0, Math.Min(input.Length, 13))}...");
         // First check if it's a valid personal number
         if (IsValidPersonnummer(input))
         {
-            Log($"{input}: All checks passed. Valid Swedish personal number (Personnummer or Samordningsnummer).");
+            Log($"{input}: PASSED. Valid Swedish personal number (Personnummer or Samordningsnummer).");
             Console.WriteLine($"{input}: Valid Swedish personal number (Personnummer or Samordningsnummer).");
             return true;
         }
@@ -61,7 +63,7 @@ public class PersonnummerValidator
         // If not a personal number, check if it's a valid organisation number
         if (IsValidOrganisationnummer(input))
         {
-            Log($"{input}: All checks passed. Valid Swedish organisation number.");
+            Log($"{input}: PASSED. Valid Swedish organisation number.");
             Console.WriteLine($"{input}: Valid Swedish organisation number.");
 
             return true;
