@@ -1,11 +1,15 @@
 #!/bin/bash
 
 # Check if .NET SDK is installed
-if ! command -v dotnet &> /dev/null
+dotnet_path=$(command -v dotnet)
+if [ -n "$dotnet_path" ]
 then
-    echo ".NET SDK is not installed. Please install it from https://dotnet.microsoft.com/download."
+    echo ".NET SDK is installed at $dotnet_path."
+else
+    echo ".NET SDK is not installed or not found in PATH. Please install it from https://dotnet.microsoft.com/download."
     exit 1
 fi
+
 
 # Build the project
 dotnet build
