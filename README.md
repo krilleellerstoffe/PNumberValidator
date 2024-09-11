@@ -57,14 +57,14 @@ To run the application:
 
 To run the tests:
 
-1. Navigate to the test project directory.
+1. Navigate to the solution directory.
 2. Build and execute the tests using the following command:
    ```bash
    dotnet test
    ```
 ## Logging
 
-The application logs all validation actions to a file called `history.log` located in the root of the project. This log contains timestamps and information about all valid and invalid attempts to validate personal, coordination, or organization numbers.
+The application logs all validation actions to a file called `history.log` located in the build folder of the project <\Main\bin\Debug\net6.0>. This log contains timestamps and information about all valid and invalid attempts to validate personal, coordination, or organization numbers.
 
 ## Examples
 
