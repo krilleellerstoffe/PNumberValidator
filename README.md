@@ -1,15 +1,15 @@
 
-# PersonnummerValidator
+# Personal Number Validator
 
 The `PersonnummerValidator` is a .NET C# application designed to validate Swedish personal numbers (Personnummer), coordination numbers (Samordningsnummer), and organization numbers (Organisationsnummer). This tool follows the rules and formats for these numbers as specified by Swedish authorities, including Skatteverket (the Swedish Tax Agency). The validator also handles historical and century-sensitive inputs, such as century adjustments for people over 100 years old.
 
 ## Features
 
-- **Personnummer Validation**: Validates 10- or 12-digit Swedish personal identity numbers, handling optional century prefix and `+` sign for individuals over 100 years old.
+- **Personnummer Validation**: Validates 10- or 12-digit Swedish personal identity numbers.
 - **Samordningsnummer Validation**: Supports validation of Swedish coordination numbers, adjusting dates for the special 61–91 range.
-- **Organisationsnummer Validation**: Validates Swedish organization numbers, which must have the third and fourth digits starting at 20 or higher.
+- **Organisationsnummer Validation**: Validates Swedish organization numbers.
 - **Luhn Algorithm**: Uses Luhn's algorithm to validate the control digit of the number.
-- **Date Validation**: Ensures that the birth date or organization number's date is valid, taking leap years into account.
+- **Date Validation**: Ensures that a birth date is valid.
 
 ## How It Works
 
@@ -20,7 +20,7 @@ Upon starting the program, users are prompted to input a 10- or 12-digit number 
 - A valid **Personnummer** (personal number) or **Samordningsnummer** (coordination number)
 - A valid **Organisationsnummer** (organization number)
 
-If the input is valid, a message is printed confirming the type of number and its validity. If the input is invalid, an error message specifying the reason is shown.
+If the input is valid, a message is printed confirming the type of number and its validity. If the input is invalid, an error message specifying the reason is logged.
 
 ### Validation Process
 
@@ -31,7 +31,12 @@ If the input is valid, a message is printed confirming the type of number and it
    - If no century is provided, the program infers the century based on the current year.
 4. **Date Validation**: The program validates the date part of the number, ensuring it represents a valid date (e.g., leap year calculations for February 29).
 5. **Luhn Check**: The last digit (control digit) is validated using Luhn's algorithm.
-6. **Organisationsnummer Validation**: For organization numbers, the third and fourth digits must be 20 or higher, and the Luhn check is applied.
+6. **Organisationsnummer Validation**: For organization numbers, the third digit must be 2 or higher, and the Luhn check is applied.
+
+## Build scripts
+Build scripts are provided which automatically checks if .net is installed, then builds, runs tests and main project.
+Linux - `build-and-run-linux.sh`
+Windows - `build-and-run-win.bat`
 
 ## Usage
 
@@ -46,10 +51,7 @@ To run the application:
    ```bash
    dotnet run --project </Main/PNumberValidator.csproj>
    ```
-## Build script
-A build script is provided which automatically checks if .net is installed, then builds and runs both tests and main projects one after another.
-Linux - `build-and-run-linux.sh`
-Windows - `build-and-run-win.bat`
+
 
 ## Running Tests
 
@@ -58,9 +60,8 @@ To run the tests:
 1. Navigate to the test project directory.
 2. Build and execute the tests using the following command:
    ```bash
-   dotnet test --project </Test/PNumberValidatorTests.csproj>
+   dotnet test
    ```
-
 ## Logging
 
 The application logs all validation actions to a file called `history.log` located in the root of the project. This log contains timestamps and information about all valid and invalid attempts to validate personal, coordination, or organization numbers.
