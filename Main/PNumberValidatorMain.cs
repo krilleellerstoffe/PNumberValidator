@@ -1,9 +1,12 @@
 ﻿namespace PNumberValidator;
 
+/// <summary>
+/// Class to validate Swedish personal and organisation numbers.
+/// </summary>
 public class PersonnummerValidator
 {
-    //define log file
     private static readonly string LogFile = "history.log";
+
     private static void Main(string[] args)
     {
         //greeting
@@ -22,223 +25,214 @@ public class PersonnummerValidator
                 Log("Exiting program.");
                 break;
             }
-
             // Validate input is not empty
-            while (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 Console.WriteLine("Input cannot be empty. Please try again:");
-                input = Console.ReadLine()?.Trim();
+                continue;
             }
             ValidateNumber(input);
-
         }
     }
 
-    public static bool ValidateNumber(string input) {
-
+    /// <summary>
+    /// Validates a 10 or 12 digit number to check if it's a valid Swedish personal or organisation number.
+    /// </summary>
+    /// <param name="input">number string</param>
+    /// <returns></returns>
+    public static bool ValidateNumber(string input)
+    {
         if (string.IsNullOrWhiteSpace(input))
         {
-            Log("ERROR: Input cannot be empty.");
+            Log("ERROR: Input is null or empty.");
             return false;
         }
         // First check if it's a valid personal number
         if (IsValidPersonnummer(input))
         {
-            Log($"{input}: Valid Swedish personal number (Personnummer or Samordningsnummer).");
+            Log($"{input}: All checks passed. Valid Swedish personal number (Personnummer or Samordningsnummer).");
+            Console.WriteLine($"{input}: Valid Swedish personal number (Personnummer or Samordningsnummer).");
             return true;
         }
         else
         {
-            Log("Not a valid personal number, checking for valid organisation number.");
+            Log($"{input}: Not valid personal number, checking if valid organisation number.");
         }
         // If not a personal number, check if it's a valid organisation number
         if (IsValidOrganisationnummer(input))
         {
-            Log($"{input}: Valid Swedish organisation number.");
+            Log($"{input}: All checks passed. Valid Swedish organisation number.");
+            Console.WriteLine($"{input}: Valid Swedish organisation number.");
+
             return true;
         }
         // If neither personal nor organisation number
-        Log("Invalid number, neither personal nor organisation number.");
+        Log($"{input}: Failed Validation");
+        Console.WriteLine($"{input}: Failed validation.");
         return false;
-
     }
-    private static void Log(string message)
-    {
-        message = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}\n";
 
-        try { File.AppendAllText(LogFile, message); }
-        catch (Exception e) { Console.WriteLine(e.Message); }
-
-        Console.WriteLine(message);
-    }
-    private static bool IsValidPersonnummer(string pNummer)
+    /// <summary>
+    /// Checks if valid Swedish personal number (Personnummer or Samordningsnummer)
+    /// </summary>
+    /// <param name="pNumber">number string</param>
+    /// <returns></returns>
+    private static bool IsValidPersonnummer(string pNumber)
     {
         // fist check for a '+' sign, which indicates the person is over 100 years old
-        bool isOver100YearsOld = pNummer.Contains("+");
+        bool isOver100YearsOld = pNumber.Contains("+");
+
         // now remove any `-` or `+` signs
-        pNummer = pNummer.Replace("-", "").Replace("+", "");
+        pNumber = pNumber.Replace("-", "").Replace("+", "");
 
         // Check if resulting number is 10 or 12 digits
-        if (pNummer.Length != 10 && pNummer.Length != 12)
+        if (pNumber.Length != 10 && pNumber.Length != 12)
         {
-            Log($"ERROR: Invalid length for Personnummer: {pNummer.Length}");
+            Log($"ERROR: Invalid length: {pNumber.Length}");
             return false;
         }
-
-        // Check if all characters are digits
-        if (!pNummer.All(char.IsDigit))
+        // Check if all remaining characters are digits
+        if (!pNumber.All(char.IsDigit))
         {
-            Log($"ERROR: Personnummer contains non-digit characters: {pNummer}");
+            Log($"ERROR: Contains non-digit characters: {pNumber}");
             return false;
         }
-
         //if no century given, calculate it
-        if (pNummer.Length == 10)
+        if (pNumber.Length == 10)
         {
-            //gets current year
             int currentYear = DateTime.Now.Year;
-            //get current century
             int thisCentury = int.Parse(currentYear.ToString().Substring(0, 2));
-            //calculate last century
             int lastCentury = thisCentury - 1;
             //if we already know the person is over 100 years old, and assuming less than 200 years old, we can assume the birth year is in the last century
             if (isOver100YearsOld)
             {
                 //add previous century to the input
-                pNummer = lastCentury + pNummer;
-                Log($"Personnummer is over 100 years old, adjusting century to {lastCentury}00s");
+                pNumber = lastCentury + pNumber;
+                Log($"Over 100 years old, adjusting century to {lastCentury}00s");
             }
             //otherwise we need to determine the century of birth
             else
             {
-                //caclulate the current YY
                 int currentYY = currentYear % 100;
-                //get YY of the input
-                int inputYY = int.Parse(pNummer.Substring(0, 2));
-                //if input YY is greater than current YY, the birth year is in the last century
-                if (inputYY > currentYY)
+                int givenYY = int.Parse(pNumber.Substring(0, 2));
+                //if given YY is greater than current YY, the birth year must the last century
+                if (givenYY > currentYY)
                 {
-                    //add the first two digits of the current year to the input
-                    pNummer = lastCentury + pNummer;
-                    Log($"Personnummer is over {currentYY} years old, adjusting century to {lastCentury}00s");
-
+                    pNumber = lastCentury + pNumber;
+                    Log($"Over {currentYY} years old, adjusting century to {lastCentury}00s");
                 }
                 //otherwise, the birth year is in the current century
                 else
                 {
                     //add the first two digits of the current year to the input
-                    pNummer = thisCentury + pNummer;
-                    Log($"Personnummer is under {currentYY} years old, adjusting century to {thisCentury}00s");
-
+                    pNumber = thisCentury + pNumber;
+                    Log($"Under {currentYY} years old, adjusting century to {thisCentury}00s");
                 }
             }
         }
         //check if the date is valid
-        if (!IsValidDate(pNummer))
+        if (!IsValidDate(pNumber))
         {
-            Log($"ERROR: Invalid date in Personnummer: {pNummer}");
+            Log($"ERROR: Invalid date in Personnummer: {pNumber}");
             return false;
         }
-        //now check the control number
-        return IsValidLuhn(pNummer);
+        //now check the control digit
+        return IsValidLuhn(pNumber);
+    }
+    /// <summary>
+    /// Checks if the date part of a personal number is a valid date
+    /// </summary>
+    /// <param name="pNumber">12 digit number string</param>
+    /// <returns></returns>
+    private static bool IsValidDate(string pNumber)
+    {
+        // Should be 12 digits at this point
+        if (pNumber.Length != 12)
+        {
+            Log($"ERROR: Must include full date in yyyyMMdd format.");
+            return false;
+        }
+        
+        int year = int.Parse(pNumber.Substring(0, 4));
+        int month = int.Parse(pNumber.Substring(4, 2));
+        int day = int.Parse(pNumber.Substring(6, 2));
+        // Adjust for samordningsnummer
+        if (day > 60)
+        {
+            day -= 60;
+            Log($"Samordningsnummer detected. Adjusting dd to {day}");
+        }
+        //simple checks for valid date including leap years
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > DateTime.DaysInMonth(year, month)) return false;
+        //check for future dates
+        if (new DateTime(year, month, day) > DateTime.Now) return false;
+        //date checks passed
+        return true;
     }
 
-    //Organisationsnummer består av tio siffror.
-    //Den tredje siffran är alltid lägst en tvåa för att undvika förväxling med personnummer för fysiska personer
-    private static bool IsValidOrganisationnummer(string oNummer)
+    /// <summary>
+    /// Checks if valid Swedish organisation number
+    /// </summary>
+    /// <param name="oNumber">number string</param>
+    /// <returns></returns>
+    private static bool IsValidOrganisationnummer(string oNumber)
     {
-        oNummer = oNummer.Replace("-", "");
+        //remove any `-` signs
+        oNumber = oNumber.Replace("-", "");
 
         // Check if resulting number is 10 or 12 digits
-        if (oNummer.Length != 10 && oNummer.Length != 12)
+        if (oNumber.Length != 10 && oNumber.Length != 12)
         {
-            Log($"ERROR: Invalid length for Organisationnummer: {oNummer.Length}");
+            Log($"ERROR: Invalid length: {oNumber.Length}");
+            return false;
+        }
+        // Check if all remaining characters are digits
+        if (!oNumber.All(char.IsDigit))
+        {
+            Log($"ERROR: Contains non-digit characters: {oNumber}");
             return false;
         }
         //if 12 digits (and the first two digits are '16'), reduce to leave a 10 digit number
-        if (oNummer.Length == 12)
+        if (oNumber.Length == 12)
         {
-            if (!oNummer.StartsWith("16"))
+            if (!oNumber.StartsWith("16"))
             {
-                Log($"ERROR: Organisationnummer with invalid century prefix: {oNummer.Substring(0, 2)}");
+                Log($"ERROR: Invalid century prefix: {oNumber.Substring(0, 2)}");
                 return false;
             }
-            oNummer = oNummer.Substring(2);
+            oNumber = oNumber.Substring(2);
         }
-/*
-        // The first digit indicates the type of organisation (not currently used)
-        int type = int.Parse(oNummer.Substring(0, 1));
-*/
-
-        // The third and fourth digits must be 20 or higher
-        if (int.Parse(oNummer.Substring(2, 2)) < 20)
+        // The third and fourth digits must be 20 or higher to be a valid organisation number
+        if (int.Parse(oNumber.Substring(2, 2)) < 20)
         {
-            Log("ERROR: The third and fourth digits of Organisationnummer must be at least 20.");
+            Log("ERROR: The third and fourth digits of 10 digit organisation number must be at least 20.");
             return false;
         }
-        // Validate with Luhn's algorithm
-        return IsValidLuhn(oNummer);
+        //now check the control digit
+        return IsValidLuhn(oNumber);
     }
 
-    /**
-     * Check date is valid by trying to parse it from the pNummer
-     **/
-    private static bool IsValidDate(string pNummer)
-    {
-        // Check for null or empty string
-        if (string.IsNullOrWhiteSpace(pNummer))
-        {
-            Log("ERROR: Date validation failed: input is null or empty.");
-            return false;
-        }
-        // Should be 12 digits at this point
-        if (pNummer.Length != 12)
-        {
-            Log($"ERROR: Date validation failed: Must include full date in yyyyMMDD format.");
-            return false;
-        }
-
-        // Parse the day in case of samordningsnummer
-        int day = int.Parse(pNummer.Substring(6, 2));
-        // Adjust for samordningsnummer
-        if (day >= 60)
-        {
-            day -= 60;
-            Log($"Samordningsnummer detected. Adjusting day to {day}");
-        }
-
-        // now check if the date is valid
-        return DateTime.TryParseExact($"{pNummer.Substring(0, 6)}{day:D2}", "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime result);
-    }
-
-    // Luhn's algorithm
-    // discountiong century, multipy every other number (except control) with 1 or 2 and sum the digits
-    // result deducted from mod 10 -> (10 - (result % 10)) % 10)
-    // eg 811218-9876 -> 8 1 1 2 1 8 9 8 7 -> 1 6 1 2 2 2 8 1 8 8 1 4 -> sum = 44 -> mod neg 10 = 6 -> valid!
+    /// <summary>
+    /// Validates control digit of a 10 digit number using Luhn's algorithm
+    /// </summary>
+    /// <param name="number">10 digit number string, excluding century</param>
+    /// <returns></returns>
     private static bool IsValidLuhn(string number)
     {
-        // Check for null or empty string
-        if (string.IsNullOrWhiteSpace(number))
-        {
-            Log("ERROR: Luhn validation failed: input is null or empty.");
-            return false;
-        }
         // check 10 or 12 digits
         if (number.Length != 10 && number.Length != 12)
         {
-            Log($"ERROR: Luhn validation failed: invalid length ({number.Length}).");
+            Log($"ERROR: Invalid length ({number.Length}).");
             return false;
         }
-
         //we need a 10 digit number to control
         if (number.Length == 12)
         {
             number = number.Substring(2);
         }
-
-        //initialise sum
+        //initialise and track whether we are on an odd or even digit
         int sum = 0;
-        //track whether we are on an odd or even digit
         bool odd = true;
         //iterate through each digit in reverse, ignoring control digit
         for (int i = number.Length - 2; i >= 0; i--)
@@ -248,19 +242,36 @@ public class PersonnummerValidator
             {
                 n *= 2;
                 //reduce to single digit if needed (eg 12 -> 3)
-                if (n > 9)
-                    n -= 9;
+                if (n > 9) n -= 9;
             }
-            //add to sum
+            //add to sum and toggle odd/even
             sum += n;
-            //toggle
             odd = !odd;
         }
         //calculate the Luhn digit
         int luhnDigit = (10 - (sum % 10)) % 10;
-        //get the control digit
-        int controlDigit = int.Parse(number[number.Length - 1].ToString());
         //now compare the control digit with the calculated Luhn digit
-        return controlDigit == luhnDigit;
+        int controlDigit = int.Parse(number[number.Length - 1].ToString());
+        if (controlDigit == luhnDigit)
+        {
+            return true;
+        }
+        else
+        {
+            Log($"ERROR: Invalid control digit. Expected {luhnDigit}, got {controlDigit}.");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Logs a message to the log file
+    /// </summary>
+    /// <param name="message"></param>
+    private static void Log(string message)
+    {
+        message = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}\n";
+
+        try { File.AppendAllText(LogFile, message); }
+        catch (Exception e) { Console.WriteLine(e.Message); }
     }
 }

@@ -66,6 +66,69 @@ public class PersonnummerTests
     }
 
     [TestMethod]
+    public void TestCenturyAdjustment()
+    {
+        // Arrange
+        string[] validCenturies = {
+        "900118+9811", // Born over 100 years ago
+        "20020103-2380", // Born in the 2000s
+        "991231-1231" // Born in the previous century (assumed 1999)
+    };
+
+        // Act & Assert
+        foreach (var number in validCenturies)
+        {
+            var result = PersonnummerValidator.ValidateNumber(number);
+            Assert.IsTrue(result, $"{number} should be a valid personnummer with century adjustment.");
+        }
+    }
+
+    [TestMethod]
+    public void TestLeapYearDate()
+    {
+        // Arrange
+        string[] validLeapYearDates = {
+        "20000229-1235", // Leap year
+    };
+
+        string[] invalidLeapYearDates = {
+        "19000229-1234", // Not a leap year
+        "20190229-1234"  // Not a leap year
+    };
+
+        // Act & Assert
+        foreach (var number in validLeapYearDates)
+        {
+            var result = PersonnummerValidator.ValidateNumber(number);
+            Assert.IsTrue(result, $"{number} should be a valid personnummer in a leap year.");
+        }
+
+        foreach (var number in invalidLeapYearDates)
+        {
+            var result = PersonnummerValidator.ValidateNumber(number);
+            Assert.IsFalse(result, $"{number} should be invalid because it's not a leap year.");
+        }
+    }
+
+    [TestMethod]
+    public void TestInvalidSamordningsnummer()
+    {
+        // Arrange
+        string[] invalidSamordningsnummer = {
+        "190910921234", // Day too high (above 91)
+        "190910601234"  // Day too low (below 61)
+    };
+
+        // Act & Assert
+        foreach (var number in invalidSamordningsnummer)
+        {
+            var result = PersonnummerValidator.ValidateNumber(number);
+            Assert.IsFalse(result, $"{number} should be an invalid Samordningsnummer due to day being out of range.");
+        }
+    }
+
+
+    [TestMethod]
     public void TestSpecialCharacters()
     {
         // Arrange
@@ -101,7 +164,9 @@ public class PersonnummerTests
             Assert.IsFalse(result, $"'{number}' should be invalid as it's empty or null.");
         }
     }
-
+    /// <summary>
+    /// The following tests are based on the examples provided by Skatteverket, but should be covered by the above tests as well.
+    /// </summary>
     [TestMethod]
     public void TestValidPersonnummer()
     {
