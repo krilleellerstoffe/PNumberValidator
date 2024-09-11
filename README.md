@@ -76,5 +76,3 @@ The application logs all validation actions to a file called `history.log` locat
 
 This project is licensed under the MIT License.
 ```
-
-This README should cover the core aspects of your application: features, how it works, usage instructions, running tests, and logging details. Let me know if you need more details!
